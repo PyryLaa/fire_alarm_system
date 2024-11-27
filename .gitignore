@@ -1,5 +1,5 @@
 **/.vs/
 
-./fire_alarm_system_solution/Debug/
+**/fire_alarm_system_solution/Debug/
 
 !./fire_alarm_system_solution/fire_alarm_system_solution.atsln

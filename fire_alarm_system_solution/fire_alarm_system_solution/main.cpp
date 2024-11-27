@@ -5,14 +5,57 @@
  * Author : Mika
  */ 
 
-#include <avr/io.h>
+#define PERIOD_EXAMPLE_VALUE 78
+#define CLKOUT_OFF 0
+#define CLKOUT_ON 1
 
+#include <avr/io.h>
+#include <avr/interrupt.h>
+#include "custom_delay.h"
+
+
+
+/*Using clock 20MHz */
+
+void clock_out(int option);
+void pin_setups();
+void led_toggle();
 
 int main(void)
 {
-    /* Replace with your application code */
-    while (1) 
-    {
-    }
+	TCA0_init();
+
+	/* enable global interrupts, just in case */
+	sei();
+	
+	pin_setups();
+	while (true) {
+		led_toggle();
+		delay_ms(600);
+	}
 }
 
+void pin_setups() {
+	/* LED pin as OUTPUT */
+	VPORTF.DIR |= (1 << 4);
+	VPORTF.OUT &= ~(1 << 4);
+}
+
+void led_toggle() {
+	VPORTF.OUT ^= (1 << 4);
+}
+
+
+// Clock signal to pin PA7
+void clock_out(int option) { // PA7
+	cli();  // Disable Interrupts
+	switch (option) {
+		case CLKOUT_ON:
+		_PROTECTED_WRITE(CLKCTRL_MCLKCTRLA, CLKCTRL_CLKOUT_bm);
+		break;
+		case CLKOUT_OFF:
+		default:
+		_PROTECTED_WRITE(CLKCTRL_MCLKCTRLA, (CLKCTRL_MCLKCTRLA & ~(CLKCTRL_CLKOUT_bm)));
+	}
+	sei();  // Enable Interrupts
+}
