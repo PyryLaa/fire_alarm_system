@@ -12,6 +12,7 @@
 #include <avr/io.h>
 #include <avr/interrupt.h>
 #include "custom_delay.h"
+#include "analogs.h"
 
 
 
@@ -23,13 +24,19 @@ void led_toggle();
 
 int main(void)
 {
+	float flame_v = 0, co_v = 0, temp_v = 0;
 	TCA0_init();
+	ADC0_init();
 
 	/* enable global interrupts, just in case */
 	sei();
 	
 	pin_setups();
 	while (true) {
+		// Example reading of sensors
+		flame_v = read_analog_channel(FLAME_CHANNEL);
+		co_v = read_analog_channel(CO_CHANNEL);
+		temp_v = read_analog_channel(TEMP_CHANNEL);
 		led_toggle();
 		delay_ms(600);
 	}
