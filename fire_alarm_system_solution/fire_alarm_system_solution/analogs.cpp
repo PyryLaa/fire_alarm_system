@@ -13,19 +13,7 @@ float read_analog_channel(ANALOG_CHANNELS channel){
 	float voltage = 0;
 	
 	// Start ADC for given channel
-	switch(channel){
-		case FLAME_CHANNEL:
-			ADC0.MUXPOS = 0; // PD0 is AIN0
-			break;
-		case CO_CHANNEL:
-			ADC0.MUXPOS = 1; // PD1 is AIN1
-			break;
-		case TEMP_CHANNEL:
-			ADC0.MUXPOS = 2; // PD2 is AIN2
-			break;
-		default:
-			break;
-	}
+	ADC0.MUXPOS = channel;
 	ADC0.COMMAND |= (0x1 << ADC_STCONV_bp); // Start conversion
 	while(!(ADC0.INTFLAGS & 0x1)); // Wait until conversion is done
 	
