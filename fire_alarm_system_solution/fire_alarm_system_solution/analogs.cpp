@@ -26,7 +26,7 @@ float read_analog_channel(ANALOG_CHANNELS channel){
 	//Read the result and convert it to voltage
 	
 	conv_res = ADC0.RES;
-	voltage = (float)conv_res * 5.0 / 1023.0;
+	voltage = (float)conv_res * (5.0 / 1023.0);
 	return voltage;
 }
 
