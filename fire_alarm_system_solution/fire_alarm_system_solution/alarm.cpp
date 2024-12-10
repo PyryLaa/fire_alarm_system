@@ -5,6 +5,7 @@
  *  Author: pyryl
  */ 
 #include <avr/io.h>
+#include <avr/interrupt.h>
 #include "alarm.h"
 #include "custom_delay.h"
 
@@ -12,7 +13,7 @@
 volatile uint8_t run_alarm = 1;
 
 /**
-* @brief Initializes TCB0 for PWM use and configures PA1 for warning LED
+* @brief Initializes TCB0 for PWM use and configures PA1 for warning LED and PC5 as reset button input
 */
 void TCB0_init(){
 	VPORTA.DIR |= (0x1 << PIN2_bp); // Make pin PA2 as output for PWM output
@@ -23,7 +24,10 @@ void TCB0_init(){
 	TCB0.CCMP = PWM_CCMP_VALUE; // Write period and duty cycle values to CCMP register. Period 0x4E and duty cycle 0x28
 	
 	VPORTA.DIR |= (0x1 << PIN1_bp); // Pin PA1 as output for led
-	VPORTA.OUT &= ~(1 << PIN1_bp); // Make sure PA1 is low
+	VPORTA.OUT &= ~(0x1 << PIN1_bp); // Make sure PA1 is low
+	
+	VPORTC.DIR &= ~(0x1 << PIN5_bp); // Pin PC5 as input
+	PORTC.PIN5CTRL |= (0x3 << PORT_ISC_gp) | (0x1 << PORT_PULLUPEN_bp); // Interrupt on falling edge and pull-up enable for PC5 
 	
 }
 
@@ -31,7 +35,7 @@ void TCB0_init(){
 * @brief Starts the alarm, PWM to speaker and LED on
 */
 void start_alarm(){
-	
+	run_alarm = 1;
 	while(run_alarm){
 		TCB0.CTRLA |= (1 << TCB_ENABLE_bp); // Enable TCB0 PWM
 		VPORTA.OUT |= (1 << PIN1_bp); // Enable warning led
@@ -40,4 +44,11 @@ void start_alarm(){
 		TCB0.CTRLA &= ~(1 << TCB_ENABLE_bp); // Disable TCB0 PWM
 		delay_ms(500);
 	}
+}
+
+ISR(PORTC_PORT_vect){ // Interrupt handler for PORTC external interrupt (alarm reset button)
+	cli(); // Disable future interrupts
+	run_alarm = 0;
+	PORTC.INTFLAGS |= (1 << PIN5_bp); // Clear PC5 interrupt flag
+	sei(); // Enable interrupts back
 }
