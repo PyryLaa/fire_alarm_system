@@ -8,6 +8,12 @@
 #include "analogs.h"
 #include "custom_delay.h"
 
+/**
+* @brief Reads the given ADC channel and returns the value converted into voltage 0-5V
+* 
+* @param[in] channel Channel that is to be read, enum defined in analogs.h
+* @return Analog read result converted into voltage as float
+*/
 float read_analog_channel(ANALOG_CHANNELS channel){
 	uint16_t conv_res = 0;
 	float voltage = 0;

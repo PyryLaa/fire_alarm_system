@@ -13,6 +13,7 @@
 #include <avr/interrupt.h>
 #include "custom_delay.h"
 #include "analogs.h"
+#include "alarm.h"
 
 
 
@@ -27,10 +28,12 @@ int main(void)
 	float flame_v = 0, co_v = 0, temp_v = 0;
 	TCA0_init();
 	ADC0_init();
+	TCB0_init();
+	
 
 	/* enable global interrupts, just in case */
 	sei();
-	
+	start_alarm();
 	pin_setups();
 	while (true) {
 		// Example reading of sensors
