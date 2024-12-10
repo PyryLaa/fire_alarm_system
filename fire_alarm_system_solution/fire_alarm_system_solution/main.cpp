@@ -22,26 +22,44 @@
 void clock_out(int option);
 void pin_setups();
 void led_toggle();
+void led_on();
+void led_off();
 
 int main(void)
 {
-	float flame_v = 0, co_v = 0, temp_v = 0;
+	float flame_voltage = 0;
+	float co_voltage = 0;
+	float temp_voltage = 0;
+
+	float co_value = 0;
+	float temp_value = 0;
+
 	TCA0_init();
 	ADC0_init();
 	TCB0_init();
-	
 
 	/* enable global interrupts, just in case */
 	sei();
-	start_alarm();
+	//start_alarm();
 	pin_setups();
 	while (true) {
 		// Example reading of sensors
-		flame_v = read_analog_channel(FLAME_CHANNEL);
-		co_v = read_analog_channel(CO_CHANNEL);
-		temp_v = read_analog_channel(TEMP_CHANNEL);
+		flame_voltage = read_analog_channel(FLAME_CHANNEL);
+		co_voltage = read_analog_channel(CO_CHANNEL);
+		temp_voltage = read_analog_channel(TEMP_CHANNEL);
+
+		co_value = co_voltage / (5.0 / 1023.0); // Volt to approximate PPM
+		temp_value = temp_voltage * 100.0; // Volt to Celsius
+		
 		led_toggle();
-		delay_ms(600);
+		//delay_ms(600);
+		
+		if (temp_value > 50 || co_value > 27 || flame_voltage > 1) {
+			led_on();
+			start_alarm();
+		} else {
+			led_off();
+		}
 	}
 }
 
@@ -54,6 +72,16 @@ void pin_setups() {
 void led_toggle() {
 	VPORTF.OUT ^= (1 << 4);
 }
+
+void led_on() {
+	VPORTF.OUT ^= (1 << 4);
+}
+
+void led_off() {
+	VPORTF.OUT ^= (1 << 4);
+}
+
+
 
 
 // Clock signal to pin PA7
