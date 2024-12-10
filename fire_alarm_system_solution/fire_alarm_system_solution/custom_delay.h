@@ -12,6 +12,4 @@
 void TCA0_init();
 void delay_ms(const int ms_time);
 
-
-
 #endif /* CUSTOM_DELAY_H_ */

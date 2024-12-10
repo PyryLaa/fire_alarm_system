@@ -18,6 +18,4 @@ enum ANALOG_CHANNELS{
 float read_analog_channel(ANALOG_CHANNELS channel);
 void ADC0_init();
 
-
-
 #endif /* ANALOGS_H_ */

@@ -7,14 +7,13 @@
 
 /*Using clock 20MHz */
 
-#define PERIOD_EXAMPLE_VALUE 78 // 1 ms resolution, about
+#define TCA_PERIOD 78 // 1 ms resolution, about
 
 #include <avr/io.h>
 #include <avr/interrupt.h>
 #include "custom_delay.h"
 
 volatile uint16_t ms_counter = 0;
-
 
 void TCA0_init()
 {
@@ -31,7 +30,7 @@ void TCA0_init()
 	TCA0.SINGLE.EVCTRL &= ~(TCA_SINGLE_CNTEI_bm);
 
 	/* set the period */
-	TCA0.SINGLE.PER = PERIOD_EXAMPLE_VALUE;
+	TCA0.SINGLE.PER = TCA_PERIOD;
 
 	/* set clock divider to 256 (sys_clk/256) */
 	TCA0.SINGLE.CTRLA = TCA_SINGLE_CLKSEL_DIV256_gc;
@@ -48,12 +47,9 @@ void delay_ms(const int ms_time) {
 	TCA0.SINGLE.CTRLA &= ~(1 << TCA_SINGLE_ENABLE_bp);
 	
 	ms_counter = 0;
-	
 }
 
-
-ISR(TCA0_OVF_vect)
-{
+ISR(TCA0_OVF_vect){
 	ms_counter++;
 
 	TCA0.SINGLE.INTFLAGS = TCA_SINGLE_OVF_bm;
